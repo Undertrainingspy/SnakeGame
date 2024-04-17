@@ -1,0 +1,8 @@
+    <resources>
+    <string name="app_name">SnakeySnakeGame</string>
+        <string name="tap_to_play">Tap To Play!</string>
+        <string name="tap_to_restart">Tap To Restart!</string>
+        <string name="name_huy_dao">Huy Dao</string>
+        <string name="name_yahir_ramos_perez">Yahir Ramos Perez</string>
+
+    </resources>
