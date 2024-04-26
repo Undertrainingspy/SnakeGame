@@ -36,11 +36,9 @@ public class GameRenderer {
 
         playBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.play); // Ensure you have a play.png in your drawables
         playBitmap = Bitmap.createScaledBitmap(playBitmap, pauseButtonSize, pauseButtonSize, false);
-
-
     }
 
-    public void draw(Snake snake, Apple apple,Obstacle obstacle, boolean paused, int score) {
+    public void draw(Snake snake, Apple apple, Obstacle obstacle, boolean paused, int score, boolean gameOver) {
         if (surfaceHolder.getSurface().isValid()) {
             Canvas canvas = surfaceHolder.lockCanvas();
 
@@ -58,11 +56,17 @@ public class GameRenderer {
             apple.draw(canvas, paint);
             snake.draw(canvas, paint);
             obstacle.draw(canvas, paint);
+
             if (paused) {
                 canvas.drawBitmap(playBitmap, null, pauseButtonRect, null);
                 drawPauseText(canvas);
             } else {
                 canvas.drawBitmap(pauseBitmap, null, pauseButtonRect, null);
+            }
+
+            if (gameOver) {
+                // Display storytelling text
+                drawGameOverText(canvas);
             }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
@@ -136,9 +140,15 @@ public class GameRenderer {
         {
             String tapToRestart = context.getResources().getString(R.string.tap_to_restart); // Access resources for text
             canvas.drawText(tapToRestart, 200, 700, paint); // Adjust position as needed
-
         }
     }
 
-
+    private void drawGameOverText(Canvas canvas) {
+        // Draw "Game Over" message
+        paint.reset(); // Reset the paint to clear previous styles
+        paint.setColor(Color.argb(255, 255, 255, 255));
+        paint.setTextSize(100);
+        String gameOverText = context.getResources().getString(R.string.game_over); // Access resources for text
+        canvas.drawText(gameOverText, 200, 500, paint); // Adjust position as needed
+    }
 }
