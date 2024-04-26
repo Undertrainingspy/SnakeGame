@@ -244,6 +244,12 @@ class SnakeGame extends SurfaceView implements Runnable {
                     //new game
                     mPaused = false;
                     newGame();
+                    gameOver = false; // Reset game over flag
+                    return true;
+                } else if (gameOver) {
+                    // Reset game if game over
+                    newGame();
+                    gameOver = false; // Reset game over flag
                     return true;
                 }
                 break;
