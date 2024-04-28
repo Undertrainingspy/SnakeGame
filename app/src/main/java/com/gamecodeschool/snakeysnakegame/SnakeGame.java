@@ -39,6 +39,10 @@ class SnakeGame extends SurfaceView implements Runnable {
 
     // How many points does the player have
     private int mScore;
+
+    private int currentLevel;
+    private int scoreForNextLevel;
+
     private final Paint mPaint;
 
     // A snake ssss
@@ -139,6 +143,9 @@ class SnakeGame extends SurfaceView implements Runnable {
 
         // Reset the mScore
         mScore = 0;
+        currentLevel = 1;
+        scoreForNextLevel = 5; // Initial score needed to level up
+        mNextFrameTime = System.currentTimeMillis();
 
         // Setup mNextFrameTime so an update can triggered
         mNextFrameTime = System.currentTimeMillis();
@@ -188,41 +195,31 @@ class SnakeGame extends SurfaceView implements Runnable {
 
     // Update all the game objects
     public void update() {
-
-        // Move the snake
         mSnake.move();
-
-        // Did the head of the snake eat the apple?
-        if(mSnake.checkDinner(mApple.getLocation())){
-            // This reminds me of Edge of Tomorrow.
-            // One day the apple will be ready!
+        if (mSnake.checkDinner(mApple.getLocation())) {
             mApple.spawn();
-
-            // Add to  mScore
-            mScore = mScore + 1;
-
-            // Play a sound
+            mScore += 1; // Increment score by 1 for each apple
             mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+
+            if (mScore >= scoreForNextLevel) {
+                currentLevel++; // Level up
+                scoreForNextLevel += (int)(scoreForNextLevel * 0.2); // Increase requirement by 20%
+                mScore=0;
+            }
         }
 
-        // Did the snake die?
         if (mSnake.detectDeath()) {
-            // Pause the game ready to start again
-            mSP.play(mCrashID, 1, 1, 0, 0, 1);
-
-            mPaused =true;
-
-            // Set game over flag
+            mPaused = true;
             gameOver = true;
+            mSP.play(mCrashID, 1, 1, 0, 0, 1);
         }
-
     }
 
 
     // Do all the drawing
     public void draw() {
         //move to GameRenderer class
-        gameRenderer.draw(mSnake, mApple,mObstacle, mPaused, mScore, gameOver);
+        gameRenderer.draw(mSnake, mApple, mObstacle, mPaused, mScore, gameOver, currentLevel, scoreForNextLevel);
     }
 
     @Override

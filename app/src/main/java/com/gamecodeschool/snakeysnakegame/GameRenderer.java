@@ -21,6 +21,9 @@ public class GameRenderer {
     private final Rect pauseButtonRect;
     private int score;
     private final Context context;
+    private int currentLevel;
+    private int scoreForNextLevel;
+
     public GameRenderer(Context context, SurfaceHolder surfaceHolder, Point size,
                         int pauseButtonSize) {
         this.surfaceHolder = surfaceHolder;
@@ -38,7 +41,7 @@ public class GameRenderer {
         playBitmap = Bitmap.createScaledBitmap(playBitmap, pauseButtonSize, pauseButtonSize, false);
     }
 
-    public void draw(Snake snake, Apple apple, Obstacle obstacle, boolean paused, int score, boolean gameOver) {
+    public void draw(Snake snake, Apple apple, Obstacle obstacle, boolean paused, int score, boolean gameOver, int currentLevel, int scoreForNextLevel) {
         if (surfaceHolder.getSurface().isValid()) {
             Canvas canvas = surfaceHolder.lockCanvas();
 
@@ -50,6 +53,8 @@ public class GameRenderer {
 
             // Score
             this.score = score;
+            this.currentLevel = currentLevel;
+            this.scoreForNextLevel = scoreForNextLevel;
             drawScore(canvas);
 
             // Draw snake and apple
@@ -74,24 +79,26 @@ public class GameRenderer {
     }
 
     private void drawScore(Canvas canvas) {
-        String scoreText = "" + score;
-        float scoreTextSize = 120;
+        // Text to display the score and level
+        String scoreText = "Level " + currentLevel + ": " + score + "/" + scoreForNextLevel;
+        float scoreTextSize = 65;
 
-        // Configure paint for outline
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(8); // Set the width of the outline
+        paint.setStrokeWidth(6); // Set the width of the outline
         paint.setColor(Color.BLACK); // Outline color
 
-        // Draw the outline
-        paint.setTextSize(scoreTextSize); // Ensure the text size is set for outline
-        canvas.drawText(scoreText, 120, 120, paint);
+        // outline
+        paint.setTextSize(scoreTextSize); // Ensure the text size is set for the outline
+        float x = 150; // X position of the text
+        float y = 100; // Y position of the text
+        canvas.drawText(scoreText, x, y, paint);
 
-        // Configure paint for text fill
+
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(230, 105, 165, 255)); // Text fill color
+        paint.setColor(Color.argb(255, 255, 204, 0)); // gold color
 
-        // Draw the text fill, which will be inside the outline
-        canvas.drawText(scoreText, 120, 120, paint);
+        canvas.drawText(scoreText, x, y, paint);
+
     }
 
     private void drawPauseText(Canvas canvas) {
