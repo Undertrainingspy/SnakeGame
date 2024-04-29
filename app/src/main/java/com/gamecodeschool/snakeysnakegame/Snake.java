@@ -190,4 +190,12 @@
             if (Math.abs(newDirection.ordinal() - this.heading.ordinal()) % 2 == 1) {
                 this.heading = newDirection;
             }}
+        public Point getHeadLocation() {
+            return segmentLocations.get(0);
         }
+        public void teleport(Point newLocation) {
+            // Additional logic to ensure teleportation is safe can be added here
+            segmentLocations.set(0, newLocation);
+        }
+
+    }

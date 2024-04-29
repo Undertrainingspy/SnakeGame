@@ -41,7 +41,7 @@ public class GameRenderer {
         playBitmap = Bitmap.createScaledBitmap(playBitmap, pauseButtonSize, pauseButtonSize, false);
     }
 
-    public void draw(Snake snake, Apple apple, Obstacle obstacle, boolean paused, int score, boolean gameOver, int currentLevel, int scoreForNextLevel) {
+    public void draw(Snake snake, Apple apple, Obstacle obstacle, Portal portal, boolean paused, int score, boolean gameOver, int currentLevel, int scoreForNextLevel) {
         if (surfaceHolder.getSurface().isValid()) {
             Canvas canvas = surfaceHolder.lockCanvas();
 
@@ -61,6 +61,9 @@ public class GameRenderer {
             apple.draw(canvas, paint);
             snake.draw(canvas, paint);
             obstacle.draw(canvas, paint);
+            if (currentLevel >= 2) {
+                portal.draw(canvas, paint);
+            }
 
             if (paused) {
                 canvas.drawBitmap(playBitmap, null, pauseButtonRect, null);
@@ -72,8 +75,9 @@ public class GameRenderer {
             if (gameOver) {
                 // Display storytelling text
                 drawGameOverText(canvas);
-            }
 
+            }
+            gameOver=false;
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
@@ -98,6 +102,7 @@ public class GameRenderer {
         paint.setColor(Color.argb(255, 255, 204, 0)); // gold color
 
         canvas.drawText(scoreText, x, y, paint);
+
 
     }
 
@@ -157,5 +162,6 @@ public class GameRenderer {
         paint.setTextSize(100);
         String gameOverText = context.getResources().getString(R.string.game_over); // Access resources for text
         canvas.drawText(gameOverText, 200, 500, paint); // Adjust position as needed
+
     }
 }

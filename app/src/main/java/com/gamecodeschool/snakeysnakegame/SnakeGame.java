@@ -17,8 +17,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import java.io.IOException;
+import java.util.Random;
 
 class SnakeGame extends SurfaceView implements Runnable {
+
+    private Random rand = new Random();
 
     // Objects for the game loop/thread
     private Thread mThread = null;
@@ -57,6 +60,7 @@ class SnakeGame extends SurfaceView implements Runnable {
     private final SurfaceHolder mSurfaceHolder;
 
     private GameRenderer gameRenderer;
+    private final Portal mPortal;
 
     // Game over flag
     private boolean gameOver = false;
@@ -117,6 +121,7 @@ class SnakeGame extends SurfaceView implements Runnable {
                         mNumBlocksHigh),
                 blockSize);
         mObstacle = new Obstacle(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        mPortal = new Portal(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
         // background bitmap
         mBackgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level1);
@@ -133,22 +138,31 @@ class SnakeGame extends SurfaceView implements Runnable {
 
     // Called to start a new game
     public void newGame() {
-
         // reset the snake
         mSnake.reset(NUM_BLOCKS_WIDE, mNumBlocksHigh);
 
-        // Get the apple ready for dinner
+        // Get the apple and obstacles ready for the game
         mApple.spawn();
         mObstacle.spawn();
 
-        // Reset the mScore
+        // Reset the score and level details
         mScore = 0;
         currentLevel = 1;
         scoreForNextLevel = 5; // Initial score needed to level up
+
+        // Ensure the game over flag is reset
+        gameOver = false;
+
+        // Setup mNextFrameTime so an update can be triggered immediately
         mNextFrameTime = System.currentTimeMillis();
 
-        // Setup mNextFrameTime so an update can triggered
-        mNextFrameTime = System.currentTimeMillis();
+        // If current level is high enough, spawn portal
+        if (currentLevel >= 2) {
+            Point portalLocation = new Point(rand.nextInt(NUM_BLOCKS_WIDE), rand.nextInt(mNumBlocksHigh));
+            mPortal.spawn(portalLocation);
+        } else {
+            mPortal.deactivate();
+        }
     }
 
 
@@ -194,6 +208,7 @@ class SnakeGame extends SurfaceView implements Runnable {
 
 
     // Update all the game objects
+// Update all the game objects
     public void update() {
         mSnake.move();
         if (mSnake.checkDinner(mApple.getLocation())) {
@@ -204,7 +219,13 @@ class SnakeGame extends SurfaceView implements Runnable {
             if (mScore >= scoreForNextLevel) {
                 currentLevel++; // Level up
                 scoreForNextLevel += (int)(scoreForNextLevel * 0.2); // Increase requirement by 20%
-                mScore=0;
+                mScore = 0;
+
+                // Check if the current level is high enough to spawn the portal
+                if (currentLevel >= 2) {
+                    Point portalLocation = new Point(rand.nextInt(NUM_BLOCKS_WIDE), rand.nextInt(mNumBlocksHigh));
+                    mPortal.spawn(portalLocation);
+                }
             }
         }
 
@@ -219,7 +240,8 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Do all the drawing
     public void draw() {
         //move to GameRenderer class
-        gameRenderer.draw(mSnake, mApple, mObstacle, mPaused, mScore, gameOver, currentLevel, scoreForNextLevel);
+        gameRenderer.draw(mSnake, mApple, mObstacle, mPortal, mPaused, mScore, gameOver, currentLevel, scoreForNextLevel);
+
     }
 
     @Override
