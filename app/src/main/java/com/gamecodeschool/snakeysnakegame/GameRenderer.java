@@ -24,11 +24,14 @@ public class GameRenderer {
     private int currentLevel;
     private int scoreForNextLevel;
 
+    private Point size;
+
     public GameRenderer(Context context, SurfaceHolder surfaceHolder, Point size,
                         int pauseButtonSize) {
         this.surfaceHolder = surfaceHolder;
         this.paint = new Paint();
         this.context = context;
+        this.size = size;
         // Initialize background and pause bitmaps
         backgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level1);
         backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap, size.x, size.y, false);
@@ -46,14 +49,21 @@ public class GameRenderer {
             Canvas canvas = surfaceHolder.lockCanvas();
 
             // Background
-            canvas.drawBitmap(backgroundBitmap, 0, 0, null);
+            
 
             // Pause button
             canvas.drawBitmap(pauseBitmap, null, pauseButtonRect, null);
 
+            setCurrentLevel(currentLevel);
+            setBackgroundBitmap(context, size);
+
+            canvas.drawBitmap(backgroundBitmap, 0, 0, null);
+            
             // Score
             this.score = score;
-            this.currentLevel = currentLevel;
+
+
+            setCurrentLevel(currentLevel);
             this.scoreForNextLevel = scoreForNextLevel;
             drawScore(canvas);
 
@@ -80,6 +90,33 @@ public class GameRenderer {
             gameOver=false;
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    public void setCurrentLevel(int currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    public void setBackgroundBitmap(Context context, Point size) {
+        switch (currentLevel) {
+            case 1:
+                backgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level1);
+                break;
+            case 2:
+                backgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level2);
+                break;
+            case 3:
+                backgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level3);
+                break;
+            case 4:
+                backgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level4);
+                break;
+
+            default:
+                backgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level1);
+                break;
+
+        }
+        backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap, size.x, size.y, false);
     }
 
     private void drawScore(Canvas canvas) {

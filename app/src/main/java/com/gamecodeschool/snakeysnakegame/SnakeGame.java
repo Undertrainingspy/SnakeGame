@@ -65,10 +65,17 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Game over flag
     private boolean gameOver = false;
 
+    private Context mContext;
+    private Point mSize;
+
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size) {
         super(context);
+
+        mContext = context;
+        mSize = size;
+
         mSurfaceHolder = getHolder();
 
         gameRenderer = new GameRenderer(context, mSurfaceHolder, size, 100);
@@ -221,6 +228,16 @@ class SnakeGame extends SurfaceView implements Runnable {
                 scoreForNextLevel += (int)(scoreForNextLevel * 0.2); // Increase requirement by 20%
                 mScore = 0;
 
+                if (currentLevel == 2) {
+                    mBackgroundBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.level2);
+                    mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,mSize.x, mSize.y, false);
+                } else if (currentLevel == 3) {
+                    mBackgroundBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.level3);
+                    mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,mSize.x, mSize.y, false);
+                } else if (currentLevel == 4) {
+                    mBackgroundBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.level4);
+                    mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap,mSize.x, mSize.y, false);
+                }
                 // Check if the current level is high enough to spawn the portal
                 if (currentLevel >= 2) {
                     Point portalLocation = new Point(rand.nextInt(NUM_BLOCKS_WIDE), rand.nextInt(mNumBlocksHigh));
@@ -228,6 +245,8 @@ class SnakeGame extends SurfaceView implements Runnable {
                 }
             }
         }
+
+
 
         if (mSnake.detectDeath()) {
             mPaused = true;
