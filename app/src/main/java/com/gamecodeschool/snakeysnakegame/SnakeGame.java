@@ -207,35 +207,66 @@ class SnakeGame extends SurfaceView implements Runnable {
     }
 
 
-    // Update all the game objects
 // Update all the game objects
-    public void update() {
-        mSnake.move();
-        if (mSnake.checkDinner(mApple.getLocation())) {
-            mApple.spawn();
-            mScore += 1; // Increment score by 1 for each apple
-            mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+public void update() {
+    mSnake.move();
+    if (mSnake.checkDinner(mApple.getLocation())) {
+        mApple.spawn();
+        mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+        mScore += 1;
 
-            if (mScore >= scoreForNextLevel) {
-                currentLevel++; // Level up
-                scoreForNextLevel += (int)(scoreForNextLevel * 0.2); // Increase requirement by 20%
-                mScore = 0;
-
-                // Check if the current level is high enough to spawn the portal
-                if (currentLevel >= 2) {
-                    Point portalLocation = new Point(rand.nextInt(NUM_BLOCKS_WIDE), rand.nextInt(mNumBlocksHigh));
-                    mPortal.spawn(portalLocation);
-                }
-            }
-        }
-
-        if (mSnake.detectDeath()) {
-            mPaused = true;
-            gameOver = true;
-            mSP.play(mCrashID, 1, 1, 0, 0, 1);
+        if (mScore >= scoreForNextLevel) {
+            levelUp();
         }
     }
 
+    // need fix
+    if (mPortal.getLocation().x != -1 && mPortal.getLocation().y != -1) {
+        if (mSnake.checkCollision(mPortal.getLocation())) {
+            currentLevel++;
+            updateBackground();
+            mPortal.deactivate(); //deactivate the portal after collision
+            scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
+            mScore = 0;
+        }
+    }
+
+    if (mSnake.detectDeath()) {
+        gameOver = true;
+        mPaused = true;
+        mSP.play(mCrashID, 1, 1, 0, 0, 1);
+    }
+}
+
+    private void levelUp() {
+        currentLevel++;
+        scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
+        mScore = 0;
+        updateBackground();
+
+        // Check if the current level should have a portal
+        if (currentLevel >= 2) {
+            Point portalLocation = new Point(rand.nextInt(NUM_BLOCKS_WIDE), rand.nextInt(mNumBlocksHigh));
+            mPortal.spawn(portalLocation);
+        } else {
+            mPortal.deactivate();
+        }
+    }
+
+    private void updateBackground() {
+        int resourceId = R.drawable.level1;
+        switch (currentLevel) {
+            case 2:
+                resourceId = R.drawable.level2;
+                break;
+            case 3:
+                resourceId = R.drawable.level3;
+                break;
+        }
+        mBackgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), resourceId);
+        mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap, mSurfaceHolder.getSurfaceFrame().width(), mSurfaceHolder.getSurfaceFrame().height(), false);
+        gameRenderer.setBackgroundBitmap(mBackgroundBitmap);
+    }
 
     // Do all the drawing
     public void draw() {

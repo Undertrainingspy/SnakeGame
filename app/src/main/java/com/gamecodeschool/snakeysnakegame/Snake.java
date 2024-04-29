@@ -197,5 +197,9 @@
             // Additional logic to ensure teleportation is safe can be added here
             segmentLocations.set(0, newLocation);
         }
+        boolean checkCollision(Point portalLocation) {
+            Point head = segmentLocations.get(0);
+            return head.equals(portalLocation);
+        }
 
     }

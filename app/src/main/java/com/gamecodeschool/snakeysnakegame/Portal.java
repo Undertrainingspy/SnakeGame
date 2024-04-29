@@ -1,23 +1,43 @@
 package com.gamecodeschool.snakeysnakegame;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.drawable.AnimatedImageDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.graphics.ImageDecoder;
+import android.graphics.ImageDecoder.Source;
 
 public class Portal implements GameObject, Movable {
     private Point location;
-    private Bitmap portalBitmap;
+    private Drawable portalDrawable;
     private int blockSize;
+    private int portalSize; // Significantly smaller size for the portal
 
     // Constructor
     public Portal(Context context, Point gameSize, int blockSize) {
         this.blockSize = blockSize;
-        portalBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.portalgif);
-        portalBitmap = Bitmap.createScaledBitmap(portalBitmap, blockSize, blockSize, false);
-        location = new Point(-1, -1); // Initially not on the screen
+        this.portalSize = blockSize / 100; // Making the portal very small, adjust this value as needed
+
+        // Calculate the exact bottom left position
+        int xPos = 0; // x-coordinate at the left edge
+        int yPos = gameSize.y - blockSize; // y-coordinate at the bottom, ensuring it's at the last block row
+
+        location = new Point(xPos / blockSize, yPos / blockSize); // Set location in terms of block coordinates
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            try {
+                Source source = ImageDecoder.createSource(context.getResources(), R.drawable.portalgif);
+                portalDrawable = ImageDecoder.decodeDrawable(source);
+                if (portalDrawable instanceof AnimatedImageDrawable) {
+                    ((AnimatedImageDrawable) portalDrawable).start();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // Method to spawn the portal at a specific location
@@ -33,8 +53,11 @@ public class Portal implements GameObject, Movable {
     // Implement draw method from GameObject interface
     @Override
     public void draw(Canvas canvas, Paint paint) {
-        if (location.x != -1 && location.y != -1) {
-            canvas.drawBitmap(portalBitmap, location.x * blockSize, location.y * blockSize, paint);
+        if (location.x != -1 && location.y != -1 && portalDrawable != null) {
+            int left = location.x * blockSize; // Calculate left position based on block size
+            int top = location.y * blockSize; // Calculate top position based on block size
+            portalDrawable.setBounds(left, top, left + portalSize, top + portalSize);
+            portalDrawable.draw(canvas);
         }
     }
 
@@ -43,11 +66,7 @@ public class Portal implements GameObject, Movable {
         location = new Point(-1, -1); // Remove from screen
     }
 
-    // Implement move method from Movable interface
     @Override
     public void move() {
-        // Logic to move the portal if necessary; possibly to a new random location
-        // For example, to move randomly every few seconds or triggered by an event
-        // Currently, this does not do anything but can be extended to have actual move logic
     }
 }

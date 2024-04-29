@@ -164,4 +164,8 @@ public class GameRenderer {
         canvas.drawText(gameOverText, 200, 500, paint); // Adjust position as needed
 
     }
+    public void setBackgroundBitmap(Bitmap newBackground) {
+        backgroundBitmap = newBackground;
+    }
+
 }
