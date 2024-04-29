@@ -138,6 +138,9 @@
                     dead = true;
                 }
             }
+            // beaten by goblins
+
+
             return dead;
         }
 
@@ -147,6 +150,19 @@
             if (head.x == appleLocation.x && head.y == appleLocation.y) {
                 segmentLocations.add(new Point(-10, -10));
                 return true;
+            }
+            return false;
+        }
+
+        // check if the snake collides with the goblin and remove knights
+        boolean checkGoblin(Point obstacleLocation) {
+            Point head = segmentLocations.get(0);
+            if (head.x == obstacleLocation.x && head.y == obstacleLocation.y) {
+                if (segmentLocations.size() > 1) {
+                    segmentLocations.remove(segmentLocations.size() - 1);
+                    return true;
+                }
+                segmentLocations.remove(new Point(-10, -10));
             }
             return false;
         }

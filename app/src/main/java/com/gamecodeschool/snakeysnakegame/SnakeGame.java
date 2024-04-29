@@ -55,6 +55,11 @@
 
         private GameRenderer gameRenderer;
 
+        // Goblin obstacle timers
+        private long prevGoblinMoveTimer;
+        private long currentTimer;
+        private static final long GOBLIN_MOVE_DELAY = 500;
+
 
         // This is the constructor method that gets called
         // from SnakeActivity
@@ -155,8 +160,14 @@
                         update();
                     }
                 }
-
                 draw();
+
+                // these handle the timer for the goblin to move speed so long as the game runs
+                currentTimer = System.currentTimeMillis();
+                if (currentTimer - prevGoblinMoveTimer >= GOBLIN_MOVE_DELAY && !mPaused) {
+                    mObstacle.move();
+                    prevGoblinMoveTimer = currentTimer;
+                }
             }
         }
 
@@ -203,6 +214,15 @@
 
                 // Play a sound
                 mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+            }
+
+            // check if the snake collided with goblins
+            if (mSnake.checkGoblin((mObstacle.getLocation()))) {
+                mObstacle.spawn();
+
+                mScore = mScore - 1;
+
+                mSP.play(mCrashID,1,1,0,0,1);
             }
 
             // Did the snake die?
