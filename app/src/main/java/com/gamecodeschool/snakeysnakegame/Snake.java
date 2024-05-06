@@ -139,7 +139,10 @@
                 }
             }
             // beaten by goblins
-
+            if(segmentLocations.isEmpty())
+            {
+                dead = true;
+            }
 
             return dead;
         }
@@ -162,7 +165,10 @@
                     segmentLocations.remove(segmentLocations.size() - 1);
                     return true;
                 }
-                segmentLocations.remove(new Point(-10, -10));
+                else {
+                    return true;
+                }
+                //segmentLocations.remove(new Point(-10, -10));
             }
             return false;
         }

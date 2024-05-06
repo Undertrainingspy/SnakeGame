@@ -223,10 +223,11 @@
                 mScore = mScore - 1;
 
                 mSP.play(mCrashID,1,1,0,0,1);
+
             }
 
             // Did the snake die?
-            if (mSnake.detectDeath()) {
+            if (mSnake.detectDeath() || mScore < 0) {
                 // Pause the game ready to start again
                 mSP.play(mCrashID, 1, 1, 0, 0, 1);
 
