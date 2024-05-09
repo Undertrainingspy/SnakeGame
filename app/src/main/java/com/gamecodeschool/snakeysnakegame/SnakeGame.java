@@ -1,6 +1,7 @@
 package com.gamecodeschool.snakeysnakegame;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -235,6 +236,12 @@ public void update() {
         gameOver = true;
         mPaused = true;
         mSP.play(mCrashID, 1, 1, 0, 0, 1);
+
+        // Intent to transition to GameOverActivity
+        if (gameOver) {
+            Intent gameOverIntent = new Intent(getContext(), game_over_screen.class);
+            getContext().startActivity(gameOverIntent);
+        }
     }
 }
 
