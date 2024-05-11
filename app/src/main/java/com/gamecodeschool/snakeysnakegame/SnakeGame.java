@@ -58,8 +58,8 @@
         // Goblin obstacle timers
         private long prevGoblinMoveTimer;
         private long currentTimer;
-        private static final long GOBLIN_MOVE_DELAY = 500;
-
+        private static final long GOBLIN_MOVE_DELAY = 1000;
+        private Point mAppleLocation;
 
         // This is the constructor method that gets called
         // from SnakeActivity
@@ -117,7 +117,8 @@
                     new Point(NUM_BLOCKS_WIDE,
                             mNumBlocksHigh),
                     blockSize);
-            mObstacle = new Obstacle(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+            mAppleLocation = mApple.getLocation();
+            mObstacle = new Obstacle(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize, mAppleLocation);
 
             // background bitmap
             mBackgroundBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.level1);

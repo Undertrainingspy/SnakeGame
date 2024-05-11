@@ -14,15 +14,23 @@ class Obstacle implements GameObject, Movable {
     private Point mSpawnRange;
     private int mSize;
     private Bitmap mBitmapGoblin;
-    private int goblinDirection;
 
 
-    Obstacle(Context context, Point sr, int s) {
+    // apple to obstacle distance
+    private int appleLocationX;
+    private int appleLocationY;
+    private int directionToApple;
+    private int randomDirection;
+    private Point mAppleLocation;
+
+
+    Obstacle(Context context, Point sr, int s, Point appleLocation) {
         mSpawnRange = sr;
         mSize = s;
         location.x = -10;
         mBitmapGoblin = BitmapFactory.decodeResource(context.getResources(), R.drawable.goblin);
         mBitmapGoblin = Bitmap.createScaledBitmap(mBitmapGoblin, s, s, false);
+        mAppleLocation = appleLocation;
     }
 
     void spawn() {
@@ -31,12 +39,27 @@ class Obstacle implements GameObject, Movable {
         location.y = random.nextInt(mSpawnRange.y - 1) + 1;
     }
 
-    // Based on 0-4, randomly move the goblin obstacle
-    @Override
-     public void move() {
-        Random random = new Random();
-        goblinDirection = random.nextInt(4);
+    // calculates distance from goblin to apple then moves horizontal/vertical depending on apple
+    private int distanceToApple() {
+        appleLocationX = mAppleLocation.x - location.x;
+        appleLocationY = mAppleLocation.y - location.y;
 
+        if (appleLocationX != 0) {
+            if (appleLocationX > 0)
+                return 1; // moves right
+            else
+                return 3; // left
+        }
+        else {
+            if (appleLocationY > 0)
+                return 2; // down
+            else
+                return 0; // up
+        }
+    }
+
+    // Based on 0-4, randomly move the goblin obstacle
+    private void goblinMovement(int goblinDirection) {
         switch (goblinDirection) {
             case 0: // move goblin up
                 if (location.y > 0) {
@@ -58,6 +81,22 @@ class Obstacle implements GameObject, Movable {
                     location.x--;
                 }
                 break;
+        }
+    }
+
+    // goblin movement can either move towards the apple or move a random direction
+    @Override
+     public void move() {
+        Random random = new Random();
+        boolean isMoveToApple = random.nextBoolean();
+
+        if (isMoveToApple) {
+            directionToApple = distanceToApple();
+            goblinMovement(directionToApple);
+        }
+        else {
+            randomDirection = random.nextInt(4);
+            goblinMovement(randomDirection);
         }
     }
 
