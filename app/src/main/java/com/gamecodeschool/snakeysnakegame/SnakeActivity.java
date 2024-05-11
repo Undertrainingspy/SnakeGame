@@ -5,7 +5,6 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.content.Intent;
 
 public class SnakeActivity extends Activity {
 
@@ -43,12 +42,6 @@ public class SnakeActivity extends Activity {
         super.onPause();
         mSnakeGame.pause();
     }
-
-    // Method to han`dle game over
-    public void handleGameOver() {
-        Intent gameOverIntent = new Intent(this, game_over_screen.class);
-        startActivity(gameOverIntent);
-    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Pass the event to the mSnakeGame instance
@@ -59,4 +52,3 @@ public class SnakeActivity extends Activity {
     }
 
 }
-

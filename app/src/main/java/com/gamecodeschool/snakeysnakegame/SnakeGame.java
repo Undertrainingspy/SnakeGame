@@ -1,7 +1,6 @@
 package com.gamecodeschool.snakeysnakegame;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -221,12 +220,10 @@ public void update() {
         }
     }
 
-    // need fix
     if (mPortal.getLocation().x != -1 && mPortal.getLocation().y != -1) {
         if (mSnake.checkCollision(mPortal.getLocation())) {
-            currentLevel++;
-            updateBackground();
-            mPortal.deactivate(); //deactivate the portal after collision
+            updateBackground(); // Only update background here upon portal collision
+            mPortal.deactivate(); // Deactivate the portal after collision
             scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
             mScore = 0;
         }
@@ -236,12 +233,6 @@ public void update() {
         gameOver = true;
         mPaused = true;
         mSP.play(mCrashID, 1, 1, 0, 0, 1);
-
-        // Intent to transition to GameOverActivity
-        if (gameOver) {
-            Intent gameOverIntent = new Intent(getContext(), game_over_screen.class);
-            getContext().startActivity(gameOverIntent);
-        }
     }
 }
 
@@ -249,7 +240,6 @@ public void update() {
         currentLevel++;
         scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
         mScore = 0;
-        updateBackground();
 
         // Check if the current level should have a portal
         if (currentLevel >= 2) {
