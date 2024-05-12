@@ -69,6 +69,13 @@ class SnakeGame extends SurfaceView implements Runnable {
 
     private int map = R.drawable.level1;
 
+    // Goblin obstacle timers
+    private long prevGoblinMoveTimer;
+    private long currentTimer;
+    private static long GOBLIN_MOVE_DELAY = 1000;
+    private long goblinSpeedTimer = 0;
+    private Point mAppleLocation;
+
 
     // This is the constructor method that gets called
     // from SnakeActivity
@@ -125,7 +132,8 @@ class SnakeGame extends SurfaceView implements Runnable {
                 new Point(NUM_BLOCKS_WIDE,
                         mNumBlocksHigh),
                 blockSize);
-        mObstacle = new Obstacle(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
+        mAppleLocation = mApple.getLocation();
+        mObstacle = new Obstacle(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize, mAppleLocation);
         mPortal = new Portal(context, new Point(NUM_BLOCKS_WIDE, mNumBlocksHigh), blockSize);
 
         // background bitmap
@@ -154,6 +162,8 @@ class SnakeGame extends SurfaceView implements Runnable {
         mScore = 0;
         currentLevel = 1;
         scoreForNextLevel = 5; // initial exp
+        goblinSpeedTimer = 0;
+        GOBLIN_MOVE_DELAY = 1000;
 
         gameOver = false;
         map = R.drawable.level1;
@@ -182,6 +192,19 @@ class SnakeGame extends SurfaceView implements Runnable {
             }
 
             draw();
+            goblinSpeedTimer += System.currentTimeMillis() - currentTimer;
+
+            // these handle the timer for the goblin to move speed so long as the game runs
+            currentTimer = System.currentTimeMillis();
+            if (currentTimer - prevGoblinMoveTimer >= GOBLIN_MOVE_DELAY && !mPaused) {
+                mObstacle.move();
+                prevGoblinMoveTimer = currentTimer;
+
+                if (goblinSpeedTimer >= 1000 && GOBLIN_MOVE_DELAY > 75) {
+                    GOBLIN_MOVE_DELAY -= 50;
+                    goblinSpeedTimer = 0;
+                }
+            }
         }
     }
 
@@ -211,41 +234,52 @@ class SnakeGame extends SurfaceView implements Runnable {
     }
 
 
-// Update all the game objects
-public void update() {
-    mSnake.move();
-    if (mSnake.checkDinner(mApple.getLocation())) {
-        mApple.spawn();
-        mSP.play(mEat_ID, 1, 1, 0, 0, 1);
-        mScore += 1;
+    // Update all the game objects
+    public void update() {
+        mSnake.move();
+        if (mSnake.checkDinner(mApple.getLocation())) {
+            mApple.spawn();
+            mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+            mScore += 1;
 
-        if (mScore >= scoreForNextLevel) {
-            levelUp();
-        }
-    }
-
-    if (mPortal.getLocation().x != -1 && mPortal.getLocation().y != -1) {
-        if (mSnake.checkCollision(mPortal.getLocation())) {
-            updateBackground(); // update background
-            mPortal.deactivate();
-            scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
-            mScore = 0;
-        }
-    }
-
-    if (mSnake.detectDeath()) {
-        gameOver = true;
-        mPaused = true;
-        mSP.play(mCrashID, 1, 1, 0, 0, 1);
-        if (gameOver) {
-            Intent gameOverIntent = new Intent(getContext(), game_over_screen.class);
-            getContext().startActivity(gameOverIntent);
-            newGame();
-
+            if (mScore >= scoreForNextLevel) {
+                levelUp();
+            }
         }
 
+        if (mPortal.getLocation().x != -1 && mPortal.getLocation().y != -1) {
+            if (mSnake.checkCollision(mPortal.getLocation())) {
+                updateBackground(); // update background
+                mPortal.deactivate();
+                scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
+                mScore = 0;
+                goblinSpeedTimer = 0;
+                GOBLIN_MOVE_DELAY = 1000;
+            }
+        }
+
+        // check if the snake collided with goblins
+        if (mSnake.checkGoblin((mObstacle.getLocation()))) {
+            mObstacle.spawn();
+
+            mScore = mScore - 1;
+
+            mSP.play(mCrashID,1,1,0,0,1);
+        }
+
+        if (mSnake.detectDeath() || mScore < 0) {
+            gameOver = true;
+            mPaused = true;
+            mSP.play(mCrashID, 1, 1, 0, 0, 1);
+            if (gameOver) {
+                Intent gameOverIntent = new Intent(getContext(), game_over_screen.class);
+                getContext().startActivity(gameOverIntent);
+                newGame();
+
+            }
+
+        }
     }
-}
 
     private void levelUp() {
         currentLevel++;
