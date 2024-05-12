@@ -58,7 +58,8 @@
         // Goblin obstacle timers
         private long prevGoblinMoveTimer;
         private long currentTimer;
-        private static final long GOBLIN_MOVE_DELAY = 1000;
+        private static long GOBLIN_MOVE_DELAY = 1000;
+        private long goblinSpeedTimer = 0;
         private Point mAppleLocation;
 
         // This is the constructor method that gets called
@@ -145,6 +146,8 @@
 
             // Reset the mScore
             mScore = 0;
+            goblinSpeedTimer = 0;
+            GOBLIN_MOVE_DELAY = 1000;
 
             // Setup mNextFrameTime so an update can triggered
             mNextFrameTime = System.currentTimeMillis();
@@ -163,11 +166,18 @@
                 }
                 draw();
 
+                goblinSpeedTimer += System.currentTimeMillis() - currentTimer;
+
                 // these handle the timer for the goblin to move speed so long as the game runs
                 currentTimer = System.currentTimeMillis();
                 if (currentTimer - prevGoblinMoveTimer >= GOBLIN_MOVE_DELAY && !mPaused) {
                     mObstacle.move();
                     prevGoblinMoveTimer = currentTimer;
+
+                    if (goblinSpeedTimer >= 1000 && GOBLIN_MOVE_DELAY > 75) {
+                        GOBLIN_MOVE_DELAY -= 50;
+                        goblinSpeedTimer = 0;
+                    }
                 }
             }
         }

@@ -157,8 +157,10 @@
             return false;
         }
 
-        // check if the snake collides with the goblin and remove knights
+        // check if any snake part collides with the goblin and remove knights
         boolean checkGoblin(Point obstacleLocation) {
+
+
             Point head = segmentLocations.get(0);
             if (head.x == obstacleLocation.x && head.y == obstacleLocation.y) {
                 if (segmentLocations.size() > 1) {
@@ -168,7 +170,13 @@
                 else {
                     return true;
                 }
-                //segmentLocations.remove(new Point(-10, -10));
+            }
+            for (int i = 0; i < segmentLocations.size(); i++) {
+                Point segment = segmentLocations.get(i);
+                if (segment.x == obstacleLocation.x && segment.y == obstacleLocation.y) {
+                    segmentLocations.remove(i);
+                    return true;
+                }
             }
             return false;
         }
