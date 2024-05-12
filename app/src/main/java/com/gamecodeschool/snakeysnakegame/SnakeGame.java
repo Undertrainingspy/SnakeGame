@@ -18,6 +18,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.Random;
+import android.content.Intent;
 
 class SnakeGame extends SurfaceView implements Runnable {
 
@@ -65,6 +66,9 @@ class SnakeGame extends SurfaceView implements Runnable {
 
     // Game over flag
     private boolean gameOver = false;
+
+    private int map = R.drawable.level1;
+
 
     // This is the constructor method that gets called
     // from SnakeActivity
@@ -149,11 +153,11 @@ class SnakeGame extends SurfaceView implements Runnable {
         // Reset the score and level details
         mScore = 0;
         currentLevel = 1;
-        scoreForNextLevel = 5; // Initial score needed to level up
+        scoreForNextLevel = 5; // initial exp
 
-        // Ensure the game over flag is reset
         gameOver = false;
-
+        map = R.drawable.level1;
+        updateBackground();
         // Setup mNextFrameTime so an update can be triggered immediately
         mNextFrameTime = System.currentTimeMillis();
 
@@ -222,8 +226,8 @@ public void update() {
 
     if (mPortal.getLocation().x != -1 && mPortal.getLocation().y != -1) {
         if (mSnake.checkCollision(mPortal.getLocation())) {
-            updateBackground(); // Only update background here upon portal collision
-            mPortal.deactivate(); // Deactivate the portal after collision
+            updateBackground(); // update background
+            mPortal.deactivate();
             scoreForNextLevel += (int)(scoreForNextLevel * 0.2);
             mScore = 0;
         }
@@ -233,6 +237,13 @@ public void update() {
         gameOver = true;
         mPaused = true;
         mSP.play(mCrashID, 1, 1, 0, 0, 1);
+        if (gameOver) {
+            Intent gameOverIntent = new Intent(getContext(), game_over_screen.class);
+            getContext().startActivity(gameOverIntent);
+            newGame();
+
+        }
+
     }
 }
 
@@ -251,16 +262,15 @@ public void update() {
     }
 
     private void updateBackground() {
-        int resourceId = R.drawable.level1;
         switch (currentLevel) {
             case 2:
-                resourceId = R.drawable.level2;
+                map = R.drawable.level2;
                 break;
             case 3:
-                resourceId = R.drawable.level3;
+                map = R.drawable.level3;
                 break;
         }
-        mBackgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), resourceId);
+        mBackgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), map);
         mBackgroundBitmap = Bitmap.createScaledBitmap(mBackgroundBitmap, mSurfaceHolder.getSurfaceFrame().width(), mSurfaceHolder.getSurfaceFrame().height(), false);
         gameRenderer.setBackgroundBitmap(mBackgroundBitmap);
     }
@@ -293,7 +303,6 @@ public void update() {
                         mPaused = false;
                         newGame();
                     } else {
-                        // If the game is not paused, handle snake direction change
                         mSnake.switchHeading(motionEvent);
                     }
                     return true;

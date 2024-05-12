@@ -33,14 +33,12 @@ public class game_over_screen extends AppCompatActivity {
         restartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Restart the game
                 finish();
             }
         });
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Exit the game
                 finish();
             }
         });
