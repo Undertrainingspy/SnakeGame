@@ -49,6 +49,7 @@ class SnakeGame extends SurfaceView implements Runnable {
     private final Paint mPaint;
 
     // A snake ssss
+
     private final Snake mSnake;
     // And an apple
     private final Apple mApple;
@@ -156,7 +157,6 @@ class SnakeGame extends SurfaceView implements Runnable {
         // Setup mNextFrameTime so an update can be triggered immediately
         mNextFrameTime = System.currentTimeMillis();
 
-        // If current level is high enough, spawn portal
         if (currentLevel >= 2) {
             Point portalLocation = new Point(rand.nextInt(NUM_BLOCKS_WIDE), rand.nextInt(mNumBlocksHigh));
             mPortal.spawn(portalLocation);
@@ -280,27 +280,25 @@ public void update() {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if (mPauseButtonRect.contains(x, y)) {
-                    // pause without reset
+                    // Toggle the pause state
                     mPaused = !mPaused;
-                    //resume the thread
-                    if (!mPlaying) {
-                        resume();
-                    }
-                    return true;
-                } else if (mPaused) {
-                    //new game
-                    mPaused = false;
-                    newGame();
                     return true;
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
-                // Let the Snake class handle the input
-                if (!mPaused) {
-                    mSnake.switchHeading(motionEvent);
+                if (!mPauseButtonRect.contains(x, y)) {
+                    if (mPaused) {
+                        // If paused and release is outside the pause button, start a new game
+                        mPaused = false;
+                        newGame();
+                    } else {
+                        // If the game is not paused, handle snake direction change
+                        mSnake.switchHeading(motionEvent);
+                    }
+                    return true;
                 }
-                return true;
+                break;
         }
         return true;
     }

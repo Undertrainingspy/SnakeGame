@@ -14,7 +14,7 @@ class Apple implements GameObject {
 
     private Point mSpawnRange;
     private int mSize;
-
+    private int currentLevel;
     private Bitmap mBitmapApple; //apple bitmap
 
     //constructor
@@ -47,7 +47,7 @@ class Apple implements GameObject {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
+    public void draw(Canvas canvas, Paint paint, int currentLevel) {
         // Draw the apple
         canvas.drawBitmap(mBitmapApple, location.x * mSize, location.y * mSize, paint);
     }

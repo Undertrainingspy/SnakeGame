@@ -14,7 +14,7 @@ class Obstacle implements GameObject {
     private Point mSpawnRange;
     private int mSize;
     private Bitmap mBitmapGoblin;
-
+    private int currentLegvel;
     Obstacle(Context context, Point sr, int s) {
         mSpawnRange = sr;
         mSize = s;
@@ -34,7 +34,7 @@ class Obstacle implements GameObject {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
+    public void draw(Canvas canvas, Paint paint, int currentLevel) {
         canvas.drawBitmap(mBitmapGoblin, location.x * mSize, location.y * mSize, paint);
     }
 }

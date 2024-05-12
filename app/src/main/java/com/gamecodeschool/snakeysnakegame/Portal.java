@@ -11,7 +11,7 @@ public class Portal implements GameObject, Movable {
     private Point location;
     private Bitmap portalBitmap;
     private int blockSize;
-
+    private int currentLevel;
     // Constructor
     public Portal(Context context, Point gameSize, int blockSize) {
         this.blockSize = blockSize;
@@ -30,7 +30,7 @@ public class Portal implements GameObject, Movable {
 
     // draw method from GameObject interface
     @Override
-    public void draw(Canvas canvas, Paint paint) {
+    public void draw(Canvas canvas, Paint paint, int currentLevel) {
         if (location.x != -1 && location.y != -1) {
             canvas.drawBitmap(portalBitmap, location.x * blockSize, location.y * blockSize, paint);
         }

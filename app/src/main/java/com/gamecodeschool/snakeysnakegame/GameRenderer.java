@@ -24,8 +24,7 @@ public class GameRenderer {
     private int currentLevel;
     private int scoreForNextLevel;
 
-    public GameRenderer(Context context, SurfaceHolder surfaceHolder, Point size,
-                        int pauseButtonSize) {
+    public GameRenderer(Context context, SurfaceHolder surfaceHolder, Point size, int pauseButtonSize) {
         this.surfaceHolder = surfaceHolder;
         this.paint = new Paint();
         this.context = context;
@@ -58,11 +57,11 @@ public class GameRenderer {
             drawScore(canvas);
 
             // Draw snake and apple
-            apple.draw(canvas, paint);
-            snake.draw(canvas, paint);
-            obstacle.draw(canvas, paint);
+            apple.draw(canvas, paint, currentLevel);
+            snake.draw(canvas, paint, currentLevel);
+            obstacle.draw(canvas, paint, currentLevel);
             if (currentLevel >= 2) {
-                portal.draw(canvas, paint);
+                portal.draw(canvas, paint, currentLevel);
             }
 
             if (paused) {

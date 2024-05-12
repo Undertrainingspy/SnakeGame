@@ -4,6 +4,7 @@
     import android.graphics.Bitmap;
     import android.graphics.BitmapFactory;
     import android.graphics.Canvas;
+    import android.graphics.Color;
     import android.graphics.Matrix;
     import android.graphics.Paint;
     import android.graphics.Point;
@@ -14,6 +15,7 @@
 
         // The location in the grid of all the segments
         private ArrayList<Point> segmentLocations = new ArrayList<>();
+
         // How big is each segment of the snake?
         private int mSegmentSize;
         // How big is the entire grid
@@ -29,7 +31,11 @@
         private Bitmap mBitmapHeadRight, mBitmapHeadLeft, mBitmapHeadUp, mBitmapHeadDown;
         // A bitmap for the body
         private Bitmap mBitmapBody;
+        private Bitmap mBitmapWarrior; // warrior
+        private Bitmap mBitmapWizard; // wizard
+        private boolean collisionDetected = false;
 
+        private int currentLevel;
         Snake(Context context, Point mr, int ss) {
             mSegmentSize = ss;
             mMoveRange = mr;
@@ -88,12 +94,18 @@
                     .createScaledBitmap(mBitmapBody,
                             ss, ss, false);
 
+            mBitmapWarrior = BitmapFactory.decodeResource(context.getResources(), R.drawable.warrior);
+            mBitmapWarrior = Bitmap.createScaledBitmap(mBitmapWarrior, ss, ss, false);
+            mBitmapWizard = BitmapFactory.decodeResource(context.getResources(), R.drawable.wizard);
+            mBitmapWizard = Bitmap.createScaledBitmap(mBitmapWizard, ss, ss, false);
+
+
             // The halfway point across the screen in pixels
             // Used to detect which side of screen was pressed
             halfWayPoint = mr.x * ss / 2;
         }
-        // Get the snake ready for a new game
 
+        // Get the snake ready for a new game
         void reset(int w, int h) {
 
             // Reset the heading
@@ -105,7 +117,6 @@
             // Start with a single snake segment
             segmentLocations.add(new Point(w / 2, h / 2));
         }
-
         @Override
         public void move() {
             // Make it the same value as the next segment
@@ -124,6 +135,7 @@
                 case LEFT: p.x--; break;
             }
         }
+
 
         boolean detectDeath() {
             //check for death
@@ -152,8 +164,9 @@
         }
 
         @Override
-        public void draw(Canvas canvas, Paint paint) {
+        public void draw(Canvas canvas, Paint paint, int currentLevel) {
             if (!segmentLocations.isEmpty()) {
+                this.currentLevel=currentLevel;
                 // Draw the head
                 switch (heading) {
                     case RIGHT: canvas.drawBitmap(mBitmapHeadRight, segmentLocations.get(0).x * mSegmentSize,
@@ -166,13 +179,36 @@
                             segmentLocations.get(0).y * mSegmentSize, paint); break;
                 }
 
-                //draw the segment
+                // Draw the body
                 for (int i = 1; i < segmentLocations.size(); i++) {
-                    canvas.drawBitmap(mBitmapBody, segmentLocations.get(i).x * mSegmentSize,
-                            segmentLocations.get(i).y * mSegmentSize, paint);
+                    if (collisionDetected) {
+                        if (currentLevel == 2 && i == 1) {
+                            canvas.drawBitmap(mBitmapWarrior, segmentLocations.get(1).x * mSegmentSize,
+                                    segmentLocations.get(1).y * mSegmentSize, paint);
+                        } else if (currentLevel == 3) {
+                            if (i == 1) {
+                                canvas.drawBitmap(mBitmapWarrior, segmentLocations.get(1).x * mSegmentSize,
+                                        segmentLocations.get(1).y * mSegmentSize, paint);
+                            } else if (i == 2) {
+                                canvas.drawBitmap(mBitmapWizard, segmentLocations.get(2).x * mSegmentSize,
+                                        segmentLocations.get(2).y * mSegmentSize, paint);
+                            } else {
+                                canvas.drawBitmap(mBitmapBody, segmentLocations.get(i).x * mSegmentSize,
+                                        segmentLocations.get(i).y * mSegmentSize, paint);
+                            }
+                        } else {
+                            canvas.drawBitmap(mBitmapBody, segmentLocations.get(i).x * mSegmentSize,
+                                    segmentLocations.get(i).y * mSegmentSize, paint);
+                        }
+                    } else {
+                        canvas.drawBitmap(mBitmapBody, segmentLocations.get(i).x * mSegmentSize,
+                                segmentLocations.get(i).y * mSegmentSize, paint);
+                    }
                 }
             }
+
         }
+
 
         void switchHeading(MotionEvent motionEvent) {
             // Is the tap on the right hand side?
@@ -199,7 +235,14 @@
         }
         boolean checkCollision(Point portalLocation) {
             Point head = segmentLocations.get(0);
-            return head.equals(portalLocation);
+            if (head.equals(portalLocation)) {
+                segmentLocations.clear();
+                segmentLocations.add(new Point(mMoveRange.x / 2, mMoveRange.y / 2));
+                collisionDetected = true;
+                return true;
+            }
+            return false;
         }
+
 
     }
