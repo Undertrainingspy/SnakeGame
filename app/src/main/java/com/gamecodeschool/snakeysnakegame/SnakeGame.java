@@ -134,7 +134,7 @@ class SnakeGame extends SurfaceView implements Runnable {
             AssetFileDescriptor descriptor;
 
             // Prepare the sounds in memory
-            descriptor = assetManager.openFd("get_apple.ogg");
+            descriptor = assetManager.openFd("crispy-bite.ogg");
             mEat_ID = mSP.load(descriptor, 0);
 
             descriptor = assetManager.openFd("snake_death.ogg");
