@@ -46,6 +46,8 @@ class SnakeGame extends SurfaceView implements Runnable {
     private int mEat_ID = -1;
     private int mCrashID = -1;
 
+    private int mBgMusic = -1;
+
     // The size in segments of the playable area
     private final int NUM_BLOCKS_WIDE = 30;
     private final int mNumBlocksHigh;
@@ -139,6 +141,9 @@ class SnakeGame extends SurfaceView implements Runnable {
 
             descriptor = assetManager.openFd("explosion.ogg");
             mCrashID = mSP.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("rattlesnake-intro-loop.ogg");
+            mBgMusic = mSP.load(descriptor,0);
 
         } catch (IOException e) {
             // Error
@@ -271,6 +276,7 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Update all the game objects
     public void update() {
         mSnake.move();
+        mSP.play(mBgMusic,1,1,0,1,1);
         if (mSnake.checkDinner(mApple.getLocation())) {
             mApple.spawn();
             mSP.play(mEat_ID, 1, 1, 0, 0, 1);
