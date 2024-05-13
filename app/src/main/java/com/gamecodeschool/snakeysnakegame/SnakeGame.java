@@ -47,7 +47,6 @@ class SnakeGame extends SurfaceView implements Runnable {
     private int mEat_ID = -1;
     private int mCrashID = -1;
 
-    private int mBgMusic = -1;
 
     // The size in segments of the playable area
     private final int NUM_BLOCKS_WIDE = 30;
@@ -137,14 +136,11 @@ class SnakeGame extends SurfaceView implements Runnable {
             AssetFileDescriptor descriptor;
 
             // Prepare the sounds in memory
-            descriptor = assetManager.openFd("crispy-bite.ogg");
+            descriptor = assetManager.openFd("Minecraft_Eating.ogg");
             mEat_ID = mSP.load(descriptor, 1);
 
             descriptor = assetManager.openFd("explosion.ogg");
             mCrashID = mSP.load(descriptor, 1);
-
-            descriptor = assetManager.openFd("get_apple.ogg");
-            mBgMusic = mSP.load(descriptor,0);
 
         } catch (IOException e) {
             // Error
