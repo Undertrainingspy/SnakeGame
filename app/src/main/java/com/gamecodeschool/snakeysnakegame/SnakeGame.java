@@ -137,10 +137,10 @@ class SnakeGame extends SurfaceView implements Runnable {
 
             // Prepare the sounds in memory
             descriptor = assetManager.openFd("crispy-bite.ogg");
-            mEat_ID = mSP.load(descriptor, 0);
+            mEat_ID = mSP.load(descriptor, 1);
 
             descriptor = assetManager.openFd("explosion.ogg");
-            mCrashID = mSP.load(descriptor, 0);
+            mCrashID = mSP.load(descriptor, 1);
 
             descriptor = assetManager.openFd("rattlesnake-intro-loop.ogg");
             mBgMusic = mSP.load(descriptor,0);
@@ -276,10 +276,12 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Update all the game objects
     public void update() {
         mSnake.move();
-        mSP.play(mBgMusic,1,1,0,1,1);
+        if(currentLevel >= 1) {
+            mSP.play(mBgMusic,1,1,0,-1,1.0F);
+        }
         if (mSnake.checkDinner(mApple.getLocation())) {
             mApple.spawn();
-            mSP.play(mEat_ID, 1, 1, 0, 0, 1);
+            mSP.play(mEat_ID, 1, 1, 1, 0, 1);
             mScore += 1;
 
             if (mScore >= scoreForNextLevel) {
@@ -315,13 +317,13 @@ class SnakeGame extends SurfaceView implements Runnable {
 
             mScore = mScore - 1;
             lives--;
-            mSP.play(mCrashID,1,1,0,0,1);
+            mSP.play(mCrashID,1,1,1,0,1);
         }
 
         if (mSnake.detectDeath() || mScore < 0 || lives <=0) {
             gameOver = true;
             mPaused = true;
-            mSP.play(mCrashID, 1, 1, 0, 0, 1);
+            mSP.play(mCrashID, 1, 1, 1, 0, 1);
             if (gameOver) {
                 Intent gameOverIntent = new Intent(getContext(), game_over_screen.class);
                 getContext().startActivity(gameOverIntent);
