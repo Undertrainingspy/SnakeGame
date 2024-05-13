@@ -2,6 +2,7 @@ package com.gamecodeschool.snakeysnakegame;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -10,6 +11,9 @@ public class SnakeActivity extends Activity {
 
     // Declare an instance of SnakeGame
     SnakeGame mSnakeGame;
+
+    //going to use mediaplayer instead of soundpool for game music
+    static MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,13 +31,22 @@ public class SnakeActivity extends Activity {
 
         // Make SnakeGame the view of the Activity
         setContentView(mSnakeGame);
+
+        //assign media player the audio file for game play
+        mediaPlayer = MediaPlayer.create(this, R.raw.game_music);
+
+        //mediaplayer looping enabled
+        mediaPlayer.setLooping(true);
     }
+
+
     // Start the thread in snakeGame
 
     @Override
     protected void onResume() {
         super.onResume();
         mSnakeGame.resume();
+        mediaPlayer.start();
     }
     // Start the thread in snakeGame
 
@@ -41,6 +54,7 @@ public class SnakeActivity extends Activity {
     protected void onPause() {
         super.onPause();
         mSnakeGame.pause();
+        mediaPlayer.pause();
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -49,6 +63,13 @@ public class SnakeActivity extends Activity {
             return mSnakeGame.onKeyDown(keyCode, event);
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    //freeup resources availble to implement when needed
+    @Override
+    protected  void onDestroy() {
+        super.onDestroy();
+        mediaPlayer.release();
     }
 
 }

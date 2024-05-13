@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.util.Log;
@@ -142,7 +143,7 @@ class SnakeGame extends SurfaceView implements Runnable {
             descriptor = assetManager.openFd("explosion.ogg");
             mCrashID = mSP.load(descriptor, 1);
 
-            descriptor = assetManager.openFd("rattlesnake-intro-loop.ogg");
+            descriptor = assetManager.openFd("get_apple.ogg");
             mBgMusic = mSP.load(descriptor,0);
 
         } catch (IOException e) {
@@ -276,9 +277,7 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Update all the game objects
     public void update() {
         mSnake.move();
-        if(currentLevel >= 1) {
-            mSP.play(mBgMusic,1,1,0,-1,1.0F);
-        }
+
         if (mSnake.checkDinner(mApple.getLocation())) {
             mApple.spawn();
             mSP.play(mEat_ID, 1, 1, 1, 0, 1);
