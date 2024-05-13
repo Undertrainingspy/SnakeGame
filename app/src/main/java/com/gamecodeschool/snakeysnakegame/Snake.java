@@ -211,7 +211,7 @@
 
                 // Draw the body
                 for (int i = 1; i < segmentLocations.size(); i++) {
-                    if (collisionDetected) {
+
                         if (currentLevel == 2 && i == 1) {
                             canvas.drawBitmap(mBitmapWarrior, segmentLocations.get(1).x * mSegmentSize,
                                     segmentLocations.get(1).y * mSegmentSize, paint);
@@ -230,12 +230,9 @@
                             canvas.drawBitmap(mBitmapBody, segmentLocations.get(i).x * mSegmentSize,
                                     segmentLocations.get(i).y * mSegmentSize, paint);
                         }
-                    } else {
-                        canvas.drawBitmap(mBitmapBody, segmentLocations.get(i).x * mSegmentSize,
-                                segmentLocations.get(i).y * mSegmentSize, paint);
                     }
                 }
-            }
+
 
         }
 

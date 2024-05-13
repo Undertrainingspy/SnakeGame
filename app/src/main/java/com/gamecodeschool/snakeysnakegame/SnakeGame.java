@@ -1,5 +1,6 @@
 package com.gamecodeschool.snakeysnakegame;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -12,6 +13,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -19,6 +21,13 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.Random;
 import android.content.Intent;
+import android.os.Handler;
+import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 class SnakeGame extends SurfaceView implements Runnable {
 
@@ -61,6 +70,15 @@ class SnakeGame extends SurfaceView implements Runnable {
     private final Rect mPauseButtonRect; //touch detection
     private final SurfaceHolder mSurfaceHolder;
 
+    private Bitmap mAbilityOneBitmap;  //ability
+    private final Rect mAbilityOneRect;
+
+    private boolean cd_one = true;
+    private Bitmap mAbilityTwoBitmap;
+    private final Rect mAbilityTwoRect;
+    private boolean cd_two = true;
+
+
     private GameRenderer gameRenderer;
     private final Portal mPortal;
 
@@ -76,6 +94,13 @@ class SnakeGame extends SurfaceView implements Runnable {
     private long goblinSpeedTimer = 0;
     private Point mAppleLocation;
 
+    // Run at 10 frames per second
+    private long TARGET_FPS = 10;
+    // There are 1000 milliseconds in a second
+    final long MILLIS_PER_SECOND = 1000;
+
+    private int lives = 3;
+    private long lastAbilityUseTime = 0;
 
     // This is the constructor method that gets called
     // from SnakeActivity
@@ -146,6 +171,18 @@ class SnakeGame extends SurfaceView implements Runnable {
         mPauseBitmap = Bitmap.createScaledBitmap(mPauseBitmap, pauseButtonSize, pauseButtonSize, false);
         mPauseButtonRect = new Rect(20, 20, 20 + pauseButtonSize, 20 + pauseButtonSize);
 
+
+        int abilityOneSize = 100;
+        mAbilityOneBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ability_one);
+        mAbilityOneBitmap = Bitmap.createScaledBitmap(mAbilityOneBitmap, abilityOneSize, abilityOneSize, false);
+        mAbilityOneRect = new Rect(20, 150, 20 + abilityOneSize, 150 + abilityOneSize);
+
+
+        int abilityTwoSize = 100;
+        mAbilityTwoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ability_two);
+        mAbilityTwoBitmap = Bitmap.createScaledBitmap(mAbilityTwoBitmap, abilityTwoSize, abilityTwoSize, false);
+        mAbilityTwoRect = new Rect(20, 300, 20 + abilityTwoSize, 300 + abilityTwoSize);
+
     }
 
 
@@ -164,6 +201,7 @@ class SnakeGame extends SurfaceView implements Runnable {
         scoreForNextLevel = 5; // initial exp
         goblinSpeedTimer = 0;
         GOBLIN_MOVE_DELAY = 1000;
+        lives=3;
 
         gameOver = false;
         map = R.drawable.level1;
@@ -212,10 +250,6 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Check to see if it is time for an update
     public boolean updateRequired() {
 
-        // Run at 10 frames per second
-        final long TARGET_FPS = 10;
-        // There are 1000 milliseconds in a second
-        final long MILLIS_PER_SECOND = 1000;
 
         // Are we due to update the frame
         if(mNextFrameTime <= System.currentTimeMillis()){
@@ -255,6 +289,17 @@ class SnakeGame extends SurfaceView implements Runnable {
                 mScore = 0;
                 goblinSpeedTimer = 0;
                 GOBLIN_MOVE_DELAY = 1000;
+                if (currentLevel==4)
+                {
+                    pauseGameAndShowEndingScene();
+                    mPaused = !mPaused;
+
+                    if (mPaused) {
+                        pause();
+                    }
+
+                }
+
             }
         }
 
@@ -263,11 +308,11 @@ class SnakeGame extends SurfaceView implements Runnable {
             mObstacle.spawn();
 
             mScore = mScore - 1;
-
+            lives--;
             mSP.play(mCrashID,1,1,0,0,1);
         }
 
-        if (mSnake.detectDeath() || mScore < 0) {
+        if (mSnake.detectDeath() || mScore < 0 || lives <=0) {
             gameOver = true;
             mPaused = true;
             mSP.play(mCrashID, 1, 1, 0, 0, 1);
@@ -279,6 +324,24 @@ class SnakeGame extends SurfaceView implements Runnable {
             }
 
         }
+
+    }
+    private void pauseGameAndShowEndingScene() {
+        fadeToEndingScene();
+    }
+    private void fadeToEndingScene() {
+        final ImageView endingScene = new ImageView(getContext());
+        endingScene.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        endingScene.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        endingScene.setImageBitmap(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.endingscene));
+
+        ((Activity) getContext()).runOnUiThread(() -> {
+            ((FrameLayout) getParent()).addView(endingScene);
+            Animation fade = new AlphaAnimation(0, 1);
+            fade.setInterpolator(new DecelerateInterpolator());
+            fade.setDuration(3000);
+            endingScene.startAnimation(fade);
+        });
     }
 
     private void levelUp() {
@@ -312,8 +375,12 @@ class SnakeGame extends SurfaceView implements Runnable {
     // Do all the drawing
     public void draw() {
         //move to GameRenderer class
-        gameRenderer.draw(mSnake, mApple, mObstacle, mPortal, mPaused, mScore, gameOver, currentLevel, scoreForNextLevel);
+        gameRenderer.draw(mSnake, mApple, mObstacle, mPortal, mPaused, mScore, gameOver, currentLevel, scoreForNextLevel, cd_one, cd_two, lives);
 
+    }
+    private void changeTargetFPS(int newTargetFPS) {
+        TARGET_FPS = newTargetFPS;
+        updateRequired();
     }
 
     @Override
@@ -324,16 +391,34 @@ class SnakeGame extends SurfaceView implements Runnable {
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if (mPauseButtonRect.contains(x, y)) {
-                    // Toggle the pause state
                     mPaused = !mPaused;
                     return true;
+                } else if (mAbilityOneRect.contains(x, y)) {
+                    cd_one=false;
+                    changeTargetFPS(5);
+                    new Handler().postDelayed(() -> {
+
+                        changeTargetFPS(10);
+                            cd_one = true;
+
+                    }, 10000);
+
+                    return true;
                 }
-                break;
+                else if (mAbilityTwoRect.contains(x, y)) {
+                    cd_two=false;
+                    lives++;
+                    new Handler().postDelayed(() -> cd_two = true, 10000);
+
+                    return true;
+                }
+            break;
+
 
             case MotionEvent.ACTION_UP:
-                if (!mPauseButtonRect.contains(x, y)) {
+                if (!mPauseButtonRect.contains(x, y)&&!mAbilityOneRect.contains(x, y)&&!mAbilityTwoRect.contains(x, y)) {
                     if (mPaused) {
-                        // If paused and release is outside the pause button, start a new game
+                        // if paused and release is outside the pause button, start a new game
                         mPaused = false;
                         newGame();
                     } else {

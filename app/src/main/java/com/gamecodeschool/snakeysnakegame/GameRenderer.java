@@ -19,10 +19,19 @@ public class GameRenderer {
     private Bitmap playBitmap;
 
     private final Rect pauseButtonRect;
+
+    private Bitmap mAbilityOneBitmap;
+    private final Rect mAbilityOneRect;
+    private Bitmap mAbilityTwoBitmap;
+    private final Rect mAbilityTwoRect;
+
     private int score;
     private final Context context;
     private int currentLevel;
     private int scoreForNextLevel;
+    private int lives;
+    private Bitmap heartBitmap;
+    private final Rect heartRect;
 
     public GameRenderer(Context context, SurfaceHolder surfaceHolder, Point size, int pauseButtonSize) {
         this.surfaceHolder = surfaceHolder;
@@ -38,9 +47,26 @@ public class GameRenderer {
 
         playBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.play); // Ensure you have a play.png in your drawables
         playBitmap = Bitmap.createScaledBitmap(playBitmap, pauseButtonSize, pauseButtonSize, false);
+
+
+        int abilityOneSize = 100;
+        mAbilityOneBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ability_one);
+        mAbilityOneBitmap = Bitmap.createScaledBitmap(mAbilityOneBitmap, abilityOneSize, abilityOneSize, false);
+        mAbilityOneRect = new Rect(20, 150, 20 + abilityOneSize, 150 + abilityOneSize);
+
+        mAbilityTwoBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ability_two);
+        mAbilityTwoBitmap = Bitmap.createScaledBitmap(mAbilityTwoBitmap, abilityOneSize, abilityOneSize, false);
+        mAbilityTwoRect = new Rect(20, 300, 20 + abilityOneSize, 300 + abilityOneSize);
+
+        int heartSize = 50; // Adjust size as needed
+        heartBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.heart);
+        heartBitmap = Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false);
+        heartRect = new Rect(150, 150, 150 + heartSize, 150 + heartSize); // Position it appropriately
+
+
     }
 
-    public void draw(Snake snake, Apple apple, Obstacle obstacle, Portal portal, boolean paused, int score, boolean gameOver, int currentLevel, int scoreForNextLevel) {
+    public void draw(Snake snake, Apple apple, Obstacle obstacle, Portal portal, boolean paused, int score, boolean gameOver, int currentLevel, int scoreForNextLevel, boolean cd_one, boolean cd_two, int lives) {
         if (surfaceHolder.getSurface().isValid()) {
             Canvas canvas = surfaceHolder.lockCanvas();
 
@@ -54,6 +80,7 @@ public class GameRenderer {
             this.score = score;
             this.currentLevel = currentLevel;
             this.scoreForNextLevel = scoreForNextLevel;
+            this.lives=lives;
             drawScore(canvas);
 
             // Draw snake and apple
@@ -63,16 +90,21 @@ public class GameRenderer {
             if (currentLevel >= 2) {
                 portal.draw(canvas, paint, currentLevel);
             }
-
+            if (currentLevel >=2 && cd_one ) {
+                canvas.drawBitmap(mAbilityOneBitmap, null, mAbilityOneRect, null);
+            }
+            if (currentLevel >=3 && cd_two ) {
+                canvas.drawBitmap(mAbilityTwoBitmap, null, mAbilityTwoRect, null);
+            }
             if (paused) {
                 canvas.drawBitmap(playBitmap, null, pauseButtonRect, null);
                 drawPauseText(canvas);
             } else {
                 canvas.drawBitmap(pauseBitmap, null, pauseButtonRect, null);
             }
+            drawLives(canvas, lives);
 
             if (gameOver) {
-                // Display storytelling text
                 drawGameOverText(canvas);
 
             }
@@ -80,14 +112,35 @@ public class GameRenderer {
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
+    private void drawLives(Canvas canvas, int lives) {
+        // Draw the heart image
+        canvas.drawBitmap(heartBitmap, null, heartRect, null);
+
+        // Text setup
+        String livesText = "x" + lives;
+        float livesTextSize = 65;
+        paint.setTextSize(livesTextSize);
+
+        float textX = heartRect.right + 10;
+        float textY = heartRect.centerY() + ((livesTextSize / 2) - 10);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(6);
+        paint.setColor(Color.BLACK);
+        canvas.drawText(livesText, textX, textY, paint);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        canvas.drawText(livesText, textX, textY, paint);
+    }
 
     private void drawScore(Canvas canvas) {
-        // Text to display the score and level
+        // display the score and level
         String scoreText = "Level " + currentLevel + ": " + score + "/" + scoreForNextLevel;
         float scoreTextSize = 65;
 
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(6); // Set the width of the outline
+        paint.setStrokeWidth(6); //
         paint.setColor(Color.BLACK); // Outline color
 
         // outline

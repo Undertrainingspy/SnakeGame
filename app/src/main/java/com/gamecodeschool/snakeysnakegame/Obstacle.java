@@ -23,6 +23,7 @@ class Obstacle implements GameObject, Movable {
     private int randomDirection;
     private Point mAppleLocation;
 
+    private static final int MIN_DISTANCE_TO_APPLE = 5; // Minimum distance from the apple, adjust as needed
 
     Obstacle(Context context, Point sr, int s, Point appleLocation) {
         mSpawnRange = sr;
@@ -37,6 +38,9 @@ class Obstacle implements GameObject, Movable {
         Random random = new Random();
         location.x = random.nextInt(mSpawnRange.x) + 1;
         location.y = random.nextInt(mSpawnRange.y - 1) + 1;
+    }
+    private boolean isTooCloseToApple() {
+        return Math.sqrt(Math.pow(appleLocationX, 2) + Math.pow(appleLocationY, 2)) < MIN_DISTANCE_TO_APPLE;
     }
 
     // calculates distance from goblin to apple then moves horizontal/vertical depending on apple
@@ -86,19 +90,19 @@ class Obstacle implements GameObject, Movable {
 
     // goblin movement can either move towards the apple or move a random direction
     @Override
-     public void move() {
+    public void move() {
         Random random = new Random();
         boolean isMoveToApple = random.nextBoolean();
 
-        if (isMoveToApple) {
-            directionToApple = distanceToApple();
+        directionToApple = distanceToApple();
+        if (isMoveToApple && !isTooCloseToApple()) {
             goblinMovement(directionToApple);
-        }
-        else {
+        } else {
             randomDirection = random.nextInt(4);
             goblinMovement(randomDirection);
         }
     }
+
 
     Point getLocation() {
         return location;
