@@ -23,12 +23,10 @@ public class game_over_screen extends AppCompatActivity {
         setContentView(R.layout.activity_game_over_screen);
         Button restartButton = findViewById(R.id.button_restart);
         Button exitButton = findViewById(R.id.button_exit);
-        // Get the game over image view
         ImageView imageView = findViewById(R.id.image_game_over);
-// Create an ObjectAnimator to fade in the image
         ObjectAnimator fadeInAnimator = ObjectAnimator.ofFloat(imageView, "alpha", 0f, 1f);
-        fadeInAnimator.setDuration(1000); // Set duration in milliseconds
-        fadeInAnimator.setInterpolator(new DecelerateInterpolator()); // Set animation interpolator
+        fadeInAnimator.setDuration(1000);
+        fadeInAnimator.setInterpolator(new DecelerateInterpolator());
         fadeInAnimator.start(); // Start the animation
         restartButton.setOnClickListener(new View.OnClickListener() {
             @Override

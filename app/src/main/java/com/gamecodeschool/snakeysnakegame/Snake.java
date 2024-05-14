@@ -257,7 +257,6 @@
             return segmentLocations.get(0);
         }
         public void teleport(Point newLocation) {
-            // Additional logic to ensure teleportation is safe can be added here
             segmentLocations.set(0, newLocation);
         }
         boolean checkCollision(Point portalLocation) {

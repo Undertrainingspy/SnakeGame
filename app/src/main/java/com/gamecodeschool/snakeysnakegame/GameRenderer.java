@@ -160,24 +160,24 @@ public class GameRenderer {
 
     private void drawPauseText(Canvas canvas) {
         String nameText = "Huy Dao";
-        String secondNameText = "Hormoz Halimi"; // Changed from "Yahir Ramos Perez"
-        String thirdNameText = "Muhammad Khawailad Khan"; // Added third name
-        String fourthNameText = "Jesse Quach"; // Added fourth name
-        float textSize = 60; // Adjust text size as needed
+        String secondNameText = "Hormoz Halimi";
+        String thirdNameText = "Muhammad Khawailad Khan";
+        String fourthNameText = "Jesse Quach";
+        float textSize = 60;
 
         paint.setTextSize(textSize);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
 
-        // Calculate positions for names
+        //  positions for names
         float nameXPosition = canvas.getWidth() - paint.measureText(nameText) - 20;
         float secondNameXPosition = canvas.getWidth() - paint.measureText(secondNameText) - 20;
         float thirdNameXPosition = canvas.getWidth() - paint.measureText(thirdNameText) - 20;
         float fourthNameXPosition = canvas.getWidth() - paint.measureText(fourthNameText) - 20;
-        float topMargin = 50; // Adjust top margin as needed
+        float topMargin = 50;
 
-        // Draw names with fill
+
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE); // Choose a color that stands out
+        paint.setColor(Color.WHITE);
         canvas.drawText(nameText, nameXPosition, topMargin, paint);
         canvas.drawText(secondNameText, secondNameXPosition, topMargin + textSize + 10, paint);
         canvas.drawText(thirdNameText, thirdNameXPosition, topMargin + (textSize * 2) + 20, paint);

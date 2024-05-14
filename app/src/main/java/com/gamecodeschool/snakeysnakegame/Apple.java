@@ -26,9 +26,7 @@ class Apple implements GameObject {
         // Hide the apple off-screen until the game starts
         location.x = -10; // Initially placing the apple off-screen
 
-        // Load the image to the bitmap
         mBitmapApple = BitmapFactory.decodeResource(context.getResources(), R.drawable.apple);
-        // Resize the bitmap
         mBitmapApple = Bitmap.createScaledBitmap(mBitmapApple, s, s, false);
     }
 
@@ -48,7 +46,7 @@ class Apple implements GameObject {
 
     @Override
     public void draw(Canvas canvas, Paint paint, int currentLevel) {
-        // Draw the apple
+        // apple draw
         canvas.drawBitmap(mBitmapApple, location.x * mSize, location.y * mSize, paint);
     }
 }

@@ -17,7 +17,7 @@ public class Portal implements GameObject, Movable {
         this.blockSize = blockSize;
         portalBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.portalgif);
         portalBitmap = Bitmap.createScaledBitmap(portalBitmap, blockSize, blockSize, false);
-        location = new Point(-1, -1); // Initially not on the screen
+        location = new Point(-1, -1); // not on the screen
     }
 
     public void spawn(Point newLocation) {

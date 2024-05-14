@@ -46,6 +46,8 @@ class SnakeGame extends SurfaceView implements Runnable {
     private final SoundPool mSP;
     private int mEat_ID = -1;
     private int mCrashID = -1;
+    private int mSkillOne = -1;
+    private int mSkillTwo = -1;
 
 
     // The size in segments of the playable area
@@ -141,6 +143,10 @@ class SnakeGame extends SurfaceView implements Runnable {
 
             descriptor = assetManager.openFd("explosion.ogg");
             mCrashID = mSP.load(descriptor, 1);
+            descriptor = assetManager.openFd("skill_one.ogg");
+            mSkillOne = mSP.load(descriptor, 1);
+            descriptor = assetManager.openFd("skill_two.ogg");
+            mSkillTwo = mSP.load(descriptor, 1);
 
         } catch (IOException e) {
             // Error
@@ -193,7 +199,6 @@ class SnakeGame extends SurfaceView implements Runnable {
         // reset the snake
         mSnake.reset(NUM_BLOCKS_WIDE, mNumBlocksHigh);
 
-        // Get the apple and obstacles ready for the game
         mApple.spawn();
         mObstacle.spawn();
 
@@ -208,7 +213,6 @@ class SnakeGame extends SurfaceView implements Runnable {
         gameOver = false;
         map = R.drawable.level1;
         updateBackground();
-        // Setup mNextFrameTime so an update can be triggered immediately
         mNextFrameTime = System.currentTimeMillis();
 
         if (currentLevel >= 2) {
@@ -397,6 +401,8 @@ class SnakeGame extends SurfaceView implements Runnable {
                     mPaused = !mPaused;
                     return true;
                 } else if (mAbilityOneRect.contains(x, y)) {
+                    mSP.play(mSkillTwo,1,1,1,0,1);
+
                     cd_one=false;
                     changeTargetFPS(5);
                     new Handler().postDelayed(() -> {
@@ -409,6 +415,8 @@ class SnakeGame extends SurfaceView implements Runnable {
                     return true;
                 }
                 else if (mAbilityTwoRect.contains(x, y)) {
+                    mSP.play(mSkillOne,1,1,1,0,1);
+
                     cd_two=false;
                     lives++;
                     new Handler().postDelayed(() -> cd_two = true, 10000);
